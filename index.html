@@ -26,6 +26,61 @@
         .view.active {
             display: block;
         }
+        .sidebar {
+            width: 200px;
+            min-height: calc(100vh - 80px);
+            background: white;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        .sidebar-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+        .sidebar-item:hover {
+            background-color: #f8fafc;
+            padding-left: 20px;
+        }
+        .sidebar-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-left: 4px solid #4f46e5;
+        }
+        .sidebar-item.active:hover {
+            padding-left: 16px;
+        }
+        .sidebar-icon {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 400px;
+            max-width: 90%;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -38,7 +93,17 @@
     </header>
 
     <!-- Main Content -->
-    <main class="container mx-auto p-4">
+    <div class="flex">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar hidden">
+            <div class="p-4 border-b border-gray-200">
+                <h3 class="font-bold text-base text-gray-800">Menu</h3>
+            </div>
+            <div id="sidebarItems"></div>
+        </div>
+        
+        <!-- Main Content -->
+        <main class="main-content flex-1">
         <!-- Sign In View -->
         <div id="signInView" class="view active">
             <div class="max-w-md mx-auto mt-8 bg-white rounded-lg card-shadow p-6">
@@ -88,20 +153,6 @@
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Phone</label>
                         <input type="tel" id="phone" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
-                    </div>
-                    <div class="grid grid-cols-3 gap-4 mb-4">
-                        <div>
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Country</label>
-                            <input type="text" id="country" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 text-sm font-bold mb-2">Region</label>
-                            <input type="text" id="region" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 text-sm font-bold mb-2">State/Province</label>
-                            <input type="text" id="province" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
-                        </div>
                     </div>
                     <div class="mb-6">
                         <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
@@ -161,26 +212,12 @@
                             <label class="block text-gray-700 text-sm font-bold mb-2">Phone</label>
                             <input type="tel" id="profilePhone" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
                         </div>
-                        <div class="grid grid-cols-3 gap-4 mb-4">
-                            <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Country</label>
-                                <input type="text" id="profileCountry" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">Region</label>
-                                <input type="text" id="profileRegion" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                            <div>
-                                <label class="block text-gray-700 text-sm font-bold mb-2">State/Province</label>
-                                <input type="text" id="profileProvince" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
-                            </div>
-                        </div>
                         <button type="submit" class="btn-primary text-white px-4 py-2 rounded-lg">Update Profile</button>
                     </form>
                 </div>
 
                 <div class="bg-white rounded-lg card-shadow p-6">
-                    <h3 class="text-xl font-bold mb-4">My Registered Events</h3>
+                    <h3 class="text-xl font-bold mb-4">My Registrations</h3>
                     <div id="userEvents"></div>
                 </div>
             </div>
@@ -235,6 +272,12 @@
                                 <input type="text" id="eventLocation" class="w-full px-3 py-2 border rounded-lg" required>
                             </div>
                             <div>
+                                <label class="block text-gray-700 text-sm font-bold mb-2">Region</label>
+                                <input type="text" id="eventRegion" class="w-full px-3 py-2 border rounded-lg" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 gap-4 mb-4">
+                            <div>
                                 <label class="block text-gray-700 text-sm font-bold mb-2">Available Spots</label>
                                 <input type="number" id="eventSpots" class="w-full px-3 py-2 border rounded-lg" required>
                             </div>
@@ -260,12 +303,35 @@
             </div>
 
             <!-- Event Registrations Section -->
-            <div class="bg-green-50 rounded-lg card-shadow p-6">
+            <div class="bg-green-50 rounded-lg card-shadow p-6 mb-6">
                 <h3 class="text-xl font-bold mb-4">Event Registrations</h3>
                 <div id="registrationsList"></div>
             </div>
+
+            <!-- Sidebar Pages Management -->
+            <div class="bg-purple-50 rounded-lg card-shadow p-6">
+                <h3 class="text-xl font-bold mb-4">Sidebar Pages Management</h3>
+                <div id="sidebarPagesManagement"></div>
+            </div>
         </div>
-    </main>
+        </main>
+    </div>
+
+    <!-- Registration Confirmation Modal -->
+    <div id="registrationModal" class="modal">
+        <div class="modal-content">
+            <h3 class="text-xl font-bold mb-4">Confirm Registration</h3>
+            <p class="mb-4">Do you really want to register for this event?</p>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Please enter your full name to confirm:</label>
+                <input type="text" id="confirmationName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="Enter your full name">
+            </div>
+            <div class="flex space-x-4">
+                <button id="confirmRegistration" class="btn-primary text-white px-4 py-2 rounded-lg">Yes, Register</button>
+                <button id="cancelRegistration" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Success/Error Messages -->
     <div id="messageContainer" class="fixed top-20 right-4 z-50"></div>
@@ -280,9 +346,6 @@
                 firstName: 'John',
                 lastName: 'Doe',
                 phone: '+1-555-0123',
-                country: 'USA',
-                region: 'North America',
-                province: 'California',
                 role: 'user'
             },
             'admin@demo.com': {
@@ -291,10 +354,31 @@
                 firstName: 'Admin',
                 lastName: 'User',
                 phone: '+1-555-0100',
-                country: 'USA',
-                region: 'North America',
-                province: 'New York',
                 role: 'admin'
+            }
+        };
+
+        // ===== SIDEBAR PAGES DATA =====
+        let sidebarPages = {
+            events: { 
+                title: 'Events', 
+                content: 'Browse and register for upcoming events.'
+            },
+            news: { 
+                title: 'News', 
+                content: 'Stay updated with the latest news and announcements from EventHub.'
+            },
+            about: { 
+                title: 'About Our Team', 
+                content: 'Learn more about the EventHub team and our mission to connect people through amazing events.'
+            },
+            social: { 
+                title: 'Our Social Media', 
+                content: 'Follow us on social media for updates and behind-the-scenes content.'
+            },
+            myRegistrations: { 
+                title: 'My Registrations', 
+                content: 'View all your registered events and manage your bookings.'
             }
         };
 
@@ -307,6 +391,7 @@
                 date: '2024-02-15',
                 time: '09:00',
                 location: 'Convention Center, San Francisco',
+                region: 'California, USA',
                 price: 299,
                 availableSpots: 150,
                 description: 'Join industry leaders for the latest in technology trends and innovations.'
@@ -318,6 +403,7 @@
                 date: '2024-03-20',
                 time: '18:00',
                 location: 'Central Park, New York',
+                region: 'New York, USA',
                 price: 89,
                 availableSpots: 500,
                 description: 'An evening of live music featuring top artists from around the world.'
@@ -329,6 +415,7 @@
                 date: '2024-02-28',
                 time: '14:00',
                 location: 'Business Center, Chicago',
+                region: 'Illinois, USA',
                 price: 149,
                 availableSpots: 50,
                 description: 'Learn essential business skills from experienced entrepreneurs.'
@@ -339,6 +426,8 @@
         let currentUser = null;
         let users = {};
         let registrations = {};
+        let currentPage = 'events';
+        let pendingEventId = null;
 
         // Initialize app
         function initApp() {
@@ -352,6 +441,7 @@
             const savedUsers = localStorage.getItem('eventhub_users');
             const savedEvents = localStorage.getItem('eventhub_events');
             const savedRegistrations = localStorage.getItem('eventhub_registrations');
+            const savedSidebarPages = localStorage.getItem('eventhub_sidebar_pages');
 
             if (savedUsers) {
                 users = JSON.parse(savedUsers);
@@ -369,6 +459,12 @@
             if (savedRegistrations) {
                 registrations = JSON.parse(savedRegistrations);
             }
+
+            if (savedSidebarPages) {
+                sidebarPages = JSON.parse(savedSidebarPages);
+            } else {
+                saveData();
+            }
         }
 
         // Save data to localStorage
@@ -376,6 +472,7 @@
             localStorage.setItem('eventhub_users', JSON.stringify(users));
             localStorage.setItem('eventhub_events', JSON.stringify(events));
             localStorage.setItem('eventhub_registrations', JSON.stringify(registrations));
+            localStorage.setItem('eventhub_sidebar_pages', JSON.stringify(sidebarPages));
         }
 
         // Check authentication status
@@ -399,6 +496,10 @@
             document.getElementById('signUpForm').addEventListener('submit', handleSignUp);
             document.getElementById('profileForm').addEventListener('submit', handleProfileUpdate);
             document.getElementById('eventForm').addEventListener('submit', handleAddEvent);
+            
+            // Modal event listeners
+            document.getElementById('confirmRegistration').addEventListener('click', confirmEventRegistration);
+            document.getElementById('cancelRegistration').addEventListener('click', closeRegistrationModal);
         }
 
         // View management
@@ -438,9 +539,6 @@
                 lastName: document.getElementById('lastName').value,
                 email: document.getElementById('signUpEmail').value,
                 phone: document.getElementById('phone').value,
-                country: document.getElementById('country').value,
-                region: document.getElementById('region').value,
-                province: document.getElementById('province').value,
                 password: document.getElementById('signUpPassword').value,
                 role: 'user'
             };
@@ -468,21 +566,130 @@
             showView('userDashboard');
             const userName = currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'John Doe';
             document.getElementById('userGreeting').textContent = `Welcome back, ${userName}!`;
-            renderEvents();
+            showSidebar();
+            renderSidebar();
+            showPage('events');
         }
 
         function showAdminDashboard() {
             showView('adminDashboard');
             const adminName = currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : 'Admin';
             document.getElementById('adminGreeting').textContent = `Admin Dashboard - ${adminName}`;
+            hideSidebar();
             renderAdminEvents();
             renderUsersList();
             renderRegistrationsList();
+            renderSidebarPagesManagement();
         }
 
         function showAdminPanel() {
             // Already on admin dashboard, just scroll to top
             window.scrollTo(0, 0);
+        }
+
+        // Sidebar management
+        function showSidebar() {
+            document.getElementById('sidebar').classList.remove('hidden');
+        }
+
+        function hideSidebar() {
+            document.getElementById('sidebar').classList.add('hidden');
+        }
+
+        function renderSidebar() {
+            const container = document.getElementById('sidebarItems');
+            const items = Object.keys(sidebarPages);
+            
+            container.innerHTML = items.map(key => `
+                <div class="sidebar-item ${currentPage === key ? 'active' : ''}" onclick="showPage('${key}')">
+                    <span>${sidebarPages[key].title}</span>
+                </div>
+            `).join('');
+        }
+
+        function showPage(pageKey) {
+            currentPage = pageKey;
+            renderSidebar();
+            
+            const mainContent = document.querySelector('.main-content');
+            
+            if (pageKey === 'events') {
+                mainContent.innerHTML = `
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">Welcome back, ${currentUser.firstName} ${currentUser.lastName}!</h2>
+                        <div class="flex space-x-4">
+                            <button onclick="showPage('myRegistrations')" class="btn-primary text-white px-4 py-2 rounded-lg">My Registrations</button>
+                            <button onclick="showView('userProfile')" class="btn-primary text-white px-4 py-2 rounded-lg">My Profile</button>
+                            <button onclick="logout()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">Logout</button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg card-shadow p-6">
+                        <h3 class="text-xl font-bold mb-4">Upcoming Events</h3>
+                        <div id="eventsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                    </div>
+                `;
+                renderEvents();
+            } else if (pageKey === 'myRegistrations') {
+                mainContent.innerHTML = `
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">My Registrations</h2>
+                        <button onclick="showPage('events')" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">Back to Events</button>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg card-shadow p-6">
+                        <div id="userRegistrations"></div>
+                    </div>
+                `;
+                renderUserRegistrations();
+            } else {
+                mainContent.innerHTML = `
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">${sidebarPages[pageKey].title}</h2>
+                        <button onclick="showPage('events')" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg">Back to Events</button>
+                    </div>
+                    
+                    <div class="bg-white rounded-lg card-shadow p-6">
+                        <p class="text-gray-700">${sidebarPages[pageKey].content}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderUserRegistrations() {
+            const container = document.getElementById('userRegistrations');
+            if (!currentUser || !registrations[currentUser.email] || registrations[currentUser.email].length === 0) {
+                container.innerHTML = '<p class="text-gray-600">No registered events yet.</p>';
+                return;
+            }
+
+            const userRegistrations = registrations[currentUser.email];
+            
+            container.innerHTML = userRegistrations.map(registration => {
+                const eventId = typeof registration === 'object' ? registration.eventId : registration;
+                const tickets = typeof registration === 'object' ? registration.tickets : 1;
+                const regDate = typeof registration === 'object' ? registration.registrationDate : null;
+                
+                const event = events.find(e => e.id === eventId);
+                if (!event) return '';
+
+                return `
+                    <div class="border rounded-lg p-4 mb-4 bg-gray-50">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-lg">${event.title}</h4>
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">${event.category}</span>
+                        </div>
+                        <div class="space-y-1 text-sm text-gray-700">
+                            <p><strong>Date:</strong> ${event.date} at ${event.time}</p>
+                            <p><strong>Location:</strong> ${event.location}</p>
+                            <p><strong>Region:</strong> ${event.region}</p>
+                            <p><strong>Tickets:</strong> ${tickets}</p>
+                            <p><strong>Total Cost:</strong> $${event.price * tickets}</p>
+                            ${regDate ? `<p><strong>Registered:</strong> ${new Date(regDate).toLocaleDateString()}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         // Profile management
@@ -495,10 +702,7 @@
                 firstName: document.getElementById('profileFirstName').value,
                 lastName: document.getElementById('profileLastName').value,
                 email: document.getElementById('profileEmail').value,
-                phone: document.getElementById('profilePhone').value,
-                country: document.getElementById('profileCountry').value,
-                region: document.getElementById('profileRegion').value,
-                province: document.getElementById('profileProvince').value
+                phone: document.getElementById('profilePhone').value
             };
 
             // Update in users object
@@ -519,9 +723,6 @@
             document.getElementById('profileLastName').value = currentUser.lastName || '';
             document.getElementById('profileEmail').value = currentUser.email || '';
             document.getElementById('profilePhone').value = currentUser.phone || '';
-            document.getElementById('profileCountry').value = currentUser.country || '';
-            document.getElementById('profileRegion').value = currentUser.region || '';
-            document.getElementById('profileProvince').value = currentUser.province || '';
             
             renderUserRegisteredEvents();
         }
@@ -540,8 +741,15 @@
                         <p><strong>Date:</strong> ${event.date}</p>
                         <p><strong>Time:</strong> ${event.time}</p>
                         <p><strong>Location:</strong> ${event.location}</p>
+                        <p><strong>Region:</strong> ${event.region}</p>
                         <p><strong>Price:</strong> $${event.price}</p>
                         <p><strong>Available Spots:</strong> ${event.availableSpots}</p>
+                    </div>
+                    <div class="flex items-center space-x-2 mb-3">
+                        <label class="text-sm font-medium">Tickets:</label>
+                        <button onclick="changeTickets(${event.id}, -1)" class="bg-gray-300 hover:bg-gray-400 px-2 py-1 rounded">-</button>
+                        <span id="tickets-${event.id}" class="px-3 py-1 bg-gray-100 rounded">1</span>
+                        <button onclick="changeTickets(${event.id}, 1)" class="bg-gray-300 hover:bg-gray-400 px-2 py-1 rounded">+</button>
                     </div>
                     <button onclick="registerForEvent(${event.id})" class="w-full btn-primary text-white py-2 rounded-lg">
                         Register
@@ -566,11 +774,27 @@
                     <div class="space-y-1 text-sm text-gray-700">
                         <p><strong>Date:</strong> ${event.date} at ${event.time}</p>
                         <p><strong>Location:</strong> ${event.location}</p>
+                        <p><strong>Region:</strong> ${event.region}</p>
                         <p><strong>Price:</strong> $${event.price}</p>
                         <p><strong>Available Spots:</strong> ${event.availableSpots}</p>
                     </div>
                 </div>
             `).join('');
+        }
+
+        // Ticket quantity management
+        let ticketQuantities = {};
+
+        function changeTickets(eventId, change) {
+            if (!ticketQuantities[eventId]) {
+                ticketQuantities[eventId] = 1;
+            }
+            
+            const newQuantity = ticketQuantities[eventId] + change;
+            if (newQuantity >= 1 && newQuantity <= 10) {
+                ticketQuantities[eventId] = newQuantity;
+                document.getElementById(`tickets-${eventId}`).textContent = newQuantity;
+            }
         }
 
         function registerForEvent(eventId) {
@@ -580,37 +804,91 @@
             }
 
             const userEmail = currentUser.email;
+            
             if (!registrations[userEmail]) {
                 registrations[userEmail] = [];
             }
 
-            if (registrations[userEmail].includes(eventId)) {
+            // Check if already registered
+            const existingRegistration = registrations[userEmail].find(reg => 
+                typeof reg === 'object' ? reg.eventId === eventId : reg === eventId
+            );
+
+            if (existingRegistration) {
                 showMessage('You are already registered for this event', 'error');
                 return;
             }
 
-            registrations[userEmail].push(eventId);
+            // Show confirmation modal
+            pendingEventId = eventId;
+            document.getElementById('confirmationName').value = '';
+            document.getElementById('registrationModal').style.display = 'block';
+        }
+
+        function confirmEventRegistration() {
+            const enteredName = document.getElementById('confirmationName').value.trim();
+            const expectedName = `${currentUser.firstName} ${currentUser.lastName}`;
+            
+            if (enteredName !== expectedName) {
+                showMessage('Please enter your correct full name to confirm registration', 'error');
+                return;
+            }
+
+            const userEmail = currentUser.email;
+            const ticketCount = ticketQuantities[pendingEventId] || 1;
+
+            // Add registration with ticket count
+            registrations[userEmail].push({
+                eventId: pendingEventId,
+                tickets: ticketCount,
+                registrationDate: new Date().toISOString()
+            });
+
             saveData();
-            showMessage('Successfully registered for event!', 'success');
+            closeRegistrationModal();
+            showMessage(`Successfully registered for event with ${ticketCount} ticket(s)!`, 'success');
+        }
+
+        function closeRegistrationModal() {
+            document.getElementById('registrationModal').style.display = 'none';
+            pendingEventId = null;
         }
 
         function renderUserRegisteredEvents() {
             const container = document.getElementById('userEvents');
-            if (!currentUser || !registrations[currentUser.email]) {
+            if (!currentUser || !registrations[currentUser.email] || registrations[currentUser.email].length === 0) {
                 container.innerHTML = '<p class="text-gray-600">No registered events yet.</p>';
                 return;
             }
 
-            const userEventIds = registrations[currentUser.email];
-            const userEvents = events.filter(event => userEventIds.includes(event.id));
+            const userRegistrations = registrations[currentUser.email];
+            
+            container.innerHTML = userRegistrations.map(registration => {
+                // Handle both old format (just eventId) and new format (object with eventId and tickets)
+                const eventId = typeof registration === 'object' ? registration.eventId : registration;
+                const tickets = typeof registration === 'object' ? registration.tickets : 1;
+                const regDate = typeof registration === 'object' ? registration.registrationDate : null;
+                
+                const event = events.find(e => e.id === eventId);
+                if (!event) return '';
 
-            container.innerHTML = userEvents.map(event => `
-                <div class="border rounded-lg p-4 mb-4">
-                    <h4 class="font-bold">${event.title}</h4>
-                    <p class="text-gray-600">${event.date} at ${event.time}</p>
-                    <p class="text-gray-600">${event.location}</p>
-                </div>
-            `).join('') || '<p class="text-gray-600">No registered events yet.</p>';
+                return `
+                    <div class="border rounded-lg p-4 mb-4 bg-gray-50">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-lg">${event.title}</h4>
+                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">${event.category}</span>
+                        </div>
+                        <div class="space-y-1 text-sm text-gray-700">
+                            <p><strong>Date:</strong> ${event.date} at ${event.time}</p>
+                            <p><strong>Location:</strong> ${event.location}</p>
+                            <p><strong>Region:</strong> ${event.region}</p>
+                            <p><strong>Tickets:</strong> ${tickets}</p>
+                            <p><strong>Total Cost:</strong> $${event.price * tickets}</p>
+                            ${regDate ? `<p><strong>Registered:</strong> ${new Date(regDate).toLocaleDateString()}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
         // Admin event management
@@ -633,6 +911,7 @@
                 date: document.getElementById('eventDate').value,
                 time: document.getElementById('eventTime').value,
                 location: document.getElementById('eventLocation').value,
+                region: document.getElementById('eventRegion').value,
                 price: parseInt(document.getElementById('eventPrice').value),
                 availableSpots: parseInt(document.getElementById('eventSpots').value),
                 description: document.getElementById('eventDescription').value
@@ -655,6 +934,7 @@
             document.getElementById('eventDate').value = event.date;
             document.getElementById('eventTime').value = event.time;
             document.getElementById('eventLocation').value = event.location;
+            document.getElementById('eventRegion').value = event.region || '';
             document.getElementById('eventPrice').value = event.price;
             document.getElementById('eventSpots').value = event.availableSpots;
             document.getElementById('eventDescription').value = event.description;
@@ -680,6 +960,7 @@
                 date: document.getElementById('eventDate').value,
                 time: document.getElementById('eventTime').value,
                 location: document.getElementById('eventLocation').value,
+                region: document.getElementById('eventRegion').value,
                 price: parseInt(document.getElementById('eventPrice').value),
                 availableSpots: parseInt(document.getElementById('eventSpots').value),
                 description: document.getElementById('eventDescription').value
@@ -713,7 +994,6 @@
                     <h4 class="font-bold">${user.firstName} ${user.lastName}</h4>
                     <p class="text-gray-600">${user.email}</p>
                     <p class="text-gray-600">${user.phone}</p>
-                    <p class="text-gray-600">${user.country}, ${user.region}, ${user.province}</p>
                 </div>
             `).join('') || '<p class="text-gray-600">No users registered yet.</p>';
         }
@@ -724,21 +1004,55 @@
             let html = '';
 
             events.forEach(event => {
-                const registeredUsers = Object.entries(registrations)
-                    .filter(([email, eventIds]) => eventIds.includes(event.id))
-                    .map(([email]) => users[email])
-                    .filter(user => user);
+                const registeredUsersData = [];
+                
+                Object.entries(registrations).forEach(([email, userRegistrations]) => {
+                    userRegistrations.forEach(registration => {
+                        const eventId = typeof registration === 'object' ? registration.eventId : registration;
+                        if (eventId === event.id) {
+                            const user = users[email];
+                            if (user) {
+                                registeredUsersData.push({
+                                    user: user,
+                                    tickets: typeof registration === 'object' ? registration.tickets : 1,
+                                    registrationDate: typeof registration === 'object' ? registration.registrationDate : null
+                                });
+                            }
+                        }
+                    });
+                });
+
+                const totalTickets = registeredUsersData.reduce((sum, data) => sum + data.tickets, 0);
 
                 html += `
                     <div class="bg-white rounded-lg p-4 mb-4 card-shadow">
-                        <h4 class="font-bold text-lg mb-2">${event.title}</h4>
-                        <p class="text-gray-600 mb-3">${event.date} at ${event.time}</p>
-                        <h5 class="font-semibold mb-2">Registered Users (${registeredUsers.length}):</h5>
-                        ${registeredUsers.length > 0 ? 
-                            registeredUsers.map(user => `
-                                <div class="border-l-4 border-blue-500 pl-3 mb-2">
-                                    <p class="font-medium">${user.firstName} ${user.lastName}</p>
-                                    <p class="text-sm text-gray-600">${user.email}</p>
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="font-bold text-lg">${event.title}</h4>
+                                <p class="text-gray-600">${event.date} at ${event.time}</p>
+                                <p class="text-gray-600">${event.location}, ${event.region}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-600">Total Registrations: ${registeredUsersData.length}</p>
+                                <p class="text-sm text-gray-600">Total Tickets: ${totalTickets}</p>
+                            </div>
+                        </div>
+                        <h5 class="font-semibold mb-2">Registered Users:</h5>
+                        ${registeredUsersData.length > 0 ? 
+                            registeredUsersData.map(data => `
+                                <div class="border-l-4 border-blue-500 pl-3 mb-3 bg-gray-50 p-3 rounded">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <p class="font-medium">${data.user.firstName} ${data.user.lastName}</p>
+                                            <p class="text-sm text-gray-600">${data.user.email}</p>
+                                            <p class="text-sm text-gray-600">${data.user.phone}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-sm font-medium">Tickets: ${data.tickets}</p>
+                                            <p class="text-sm text-gray-600">Total: $${event.price * data.tickets}</p>
+                                            ${data.registrationDate ? `<p class="text-xs text-gray-500">Registered: ${new Date(data.registrationDate).toLocaleDateString()}</p>` : ''}
+                                        </div>
+                                    </div>
                                 </div>
                             `).join('') : 
                             '<p class="text-gray-500 italic">No registrations yet</p>'
@@ -748,6 +1062,37 @@
             });
 
             container.innerHTML = html || '<p class="text-gray-600">No events available.</p>';
+        }
+
+        // Sidebar pages management for admin
+        function renderSidebarPagesManagement() {
+            const container = document.getElementById('sidebarPagesManagement');
+            
+            container.innerHTML = Object.keys(sidebarPages).map(key => `
+                <div class="bg-white rounded-lg p-4 mb-4 card-shadow">
+                    <div class="flex justify-between items-start mb-2">
+                        <h4 class="font-bold text-lg">${sidebarPages[key].title}</h4>
+                        <button onclick="editSidebarPage('${key}')" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-sm">Edit</button>
+                    </div>
+                    <p class="text-gray-600 text-sm">${sidebarPages[key].content}</p>
+                </div>
+            `).join('');
+        }
+
+        function editSidebarPage(pageKey) {
+            const newTitle = prompt('Enter new title:', sidebarPages[pageKey].title);
+            if (newTitle && newTitle.trim()) {
+                sidebarPages[pageKey].title = newTitle.trim();
+            }
+            
+            const newContent = prompt('Enter new content:', sidebarPages[pageKey].content);
+            if (newContent && newContent.trim()) {
+                sidebarPages[pageKey].content = newContent.trim();
+            }
+            
+            saveData();
+            renderSidebarPagesManagement();
+            showMessage('Sidebar page updated successfully!', 'success');
         }
 
         // Message system
@@ -782,5 +1127,5 @@
             observer.observe(profileView, { attributes: true });
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'974fe897e50735a1',t:'MTc1NjE3NTQ0MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97524b4d4584b5b5',t:'MTc1NjIwMDQ1NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
